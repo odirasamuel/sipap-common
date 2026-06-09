@@ -429,8 +429,6 @@ config = load_config("config.yml")
 
 ## Architecture
 
-This package adopts proven patterns from Sentinel:
-
 1. **ContextVar-Based Logging**: Thread-safe and async-safe context propagation
 2. **Jinja2 Template Processing**: `${ VARIABLE }` syntax for environment variables
 3. **Graceful Degradation**: Missing config vars default to empty string
