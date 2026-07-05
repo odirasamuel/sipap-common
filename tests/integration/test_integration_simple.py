@@ -20,7 +20,6 @@ from sipap_common.utils import (
     safe_json_loads,
 )
 
-
 # ========================================
 # Config Integration Tests
 # ========================================
