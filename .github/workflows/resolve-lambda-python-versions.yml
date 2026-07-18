@@ -1,0 +1,64 @@
+name: Resolve Lambda Python Versions
+
+on:
+  workflow_call:
+    outputs:
+      matrix:
+        description: "Matrix JSON of the 3 latest Lambda-supported Python runtimes"
+        value: ${{ jobs.resolve.outputs.matrix }}
+  workflow_dispatch:
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - name: Install jq
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Resolve latest 3 Lambda-supported Python runtimes
+        id: set-matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Fetch AWS Lambda runtime versions from endoflife.date API
+          # Filter for Python runtimes that are not EOL and sort to get latest 3
+          curl -s 'https://endoflife.date/api/v1/products/aws-lambda' \
+          | jq -r '
+              {
+                include: (
+                  .result.releases
+                  | map(select(.name | startswith("python")))
+                  | map(select(.isEol == false))
+                  | sort_by(.name | sub("python"; "") | split(".") | map(tonumber))
+                  | reverse
+                  | .[:3]
+                  | map({python: (.name | sub("python"; ""))})
+                )
+              }
+            ' > matrix.json
+
+          echo "Resolved latest 3 Lambda Python runtimes:"
+          cat matrix.json
+
+          # Validate the output is valid JSON and has entries
+          if ! jq -e '.include | length > 0' matrix.json > /dev/null; then
+            echo "❌ Failed to resolve Python versions - empty result"
+            exit 1
+          fi
+
+          # Validate each entry has a 'python' key
+          if ! jq -e '.include | all(has("python"))' matrix.json > /dev/null; then
+            echo "❌ Invalid matrix format - missing 'python' key"
+            exit 1
+          fi
+
+          echo "✅ Successfully resolved $(jq '.include | length' matrix.json) Python versions"
+
+          echo "matrix=$(tr -d '\n' < matrix.json)" >> "$GITHUB_OUTPUT"

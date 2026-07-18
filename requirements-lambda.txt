@@ -1,0 +1,11 @@
+# Lambda Layer Dependencies for sipap-common
+# These are the runtime dependencies that will be packaged into the Lambda layer
+
+pyyaml>=6.0.2
+jinja2>=3.1.4
+boto3>=1.34.0
+redis>=5.0.0
+hiredis>=2.3.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+typing-extensions>=4.12.0
