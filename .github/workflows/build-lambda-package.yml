@@ -157,4 +157,3 @@ jobs:
 
           # Output S3 URI for reference
           echo "S3_URI=s3://${S3_BUCKET}/${KEY}" >> "$GITHUB_ENV"
-
