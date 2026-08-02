@@ -138,3 +138,48 @@ class ValidationError(SIPAPException):
     Example:
         >>> raise ValidationError("Field 'match_id' is required")
     """
+
+
+class MCPError(SIPAPException):
+    """
+    Raised when MCP (Model Context Protocol) calls fail.
+
+    This includes errors from:
+    - MCP server connection failures
+    - MCP tool execution errors
+    - MCP server timeout
+    - Invalid MCP responses
+
+    Example:
+        >>> raise MCPError("MCP server 'data' failed to respond: timeout")
+    """
+
+
+class AgentError(SIPAPException):
+    """
+    Raised when AI agent execution fails.
+
+    This includes errors from:
+    - Agent initialization failures
+    - Agent prediction errors
+    - Agent tool execution failures
+    - Invalid agent outputs
+
+    Example:
+        >>> raise AgentError("Statistical agent failed: invalid prediction format")
+    """
+
+
+class PredictionError(SIPAPException):
+    """
+    Raised when prediction generation fails.
+
+    This includes errors from:
+    - Insufficient context quality
+    - Ensemble calculation failures
+    - Quality gate failures
+    - Expected value calculation errors
+
+    Example:
+        >>> raise PredictionError("Ensemble prediction failed: insufficient agent consensus")
+    """
