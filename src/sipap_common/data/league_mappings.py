@@ -342,6 +342,14 @@ LEAGUE_ALIASES: dict[str, str] = {
     "gold cup": "CONCACAF Gold Cup",
     "concacaf gold cup": "CONCACAF Gold Cup",
 
+    # Friendlies
+    "club friendlies": "Friendlies Clubs",
+    "club friendly": "Friendlies Clubs",
+    "friendlies clubs": "Friendlies Clubs",
+    "international friendlies": "Friendlies",
+    "international friendly": "Friendlies",
+    "friendlies": "Friendlies",
+
     # South American Competitions
     "libertadores": "CONMEBOL Libertadores",
     "copa libertadores": "CONMEBOL Libertadores",
