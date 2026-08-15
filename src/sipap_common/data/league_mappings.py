@@ -12,6 +12,48 @@ Used by orchestrator for interpreting user queries like:
 - "Cupa României" → Cupa României (Romania Cup)
 """
 
+# International/continental tournaments (API-Football labels as country="World")
+# These should NOT be filtered by host country (e.g., "World Cup in Qatar" → country=None)
+INTERNATIONAL_TOURNAMENTS: set[str] = {
+    "uefa champions league",
+    "uefa europa league",
+    "uefa europa conference league",
+    "uefa nations league",
+    "uefa super cup",
+    "uefa youth league",
+    "uefa championship - women",
+    "uefa championship - women - qualification",
+    "uefa europa cup - women",
+    "uefa nations league - women",
+    "champions league women",
+    "world cup",
+    "world cup - women",
+    "world cup - qualification",
+    "world cup - u17",
+    "world cup - u20",
+    "euro championship",
+    "euro championship - qualification",
+    "copa america",
+    "africa cup of nations",
+    "asia cup",
+    "asian cup",
+    "concacaf gold cup",
+    "concacaf nations league",
+    "conmebol libertadores",
+    "conmebol sudamericana",
+    "caf champions league",
+    "caf confederation cup",
+    "afc champions league",
+    "concacaf champions league",
+    "fifa club world cup",
+    "fifa intercontinental cup",
+    "confederations cup",
+    "arab cup",
+    "friendlies",
+    "friendlies clubs",
+    "international champions cup",
+}
+
 # Country name variants for natural language queries
 # Includes adjectives (Spanish, English, French, etc.) for user-friendly queries
 # Comprehensive list covering 77 countries
@@ -898,3 +940,97 @@ def find_similar_leagues(
 
     # Return top N suggestions
     return unique_suggestions[:max_suggestions]
+
+
+# League abbreviations for compact display (WhatsApp, mobile, etc.)
+# Maps canonical league names to short abbreviations (3-6 chars)
+LEAGUE_ABBREVIATIONS: dict[str, str] = {
+    # Top European Leagues
+    "Premier League": "PL",
+    "La Liga": "LaLiga",
+    "Serie A": "SerieA",
+    "Bundesliga": "BuLi",
+    "Ligue 1": "L1",
+    "Ligue 2": "L2",
+    "Championship": "Champ",
+    "Eredivisie": "Erediv",
+    "Primeira Liga": "Liga PT",
+    "Belgian Pro League": "ProLg",
+    "Jupiler Pro League": "ProLg",
+
+    # Second Divisions
+    "Segunda División": "LaLiga2",
+    "Serie B": "SerieB",
+    "2. Bundesliga": "2.BuLi",
+
+    # Cups
+    "FA Cup": "FAC",
+    "League Cup": "EFL",
+    "Copa del Rey": "CDR",
+    "Coppa Italia": "CoppaIT",
+    "DFB Pokal": "DFB",
+    "Coupe de France": "CdF",
+
+    # UEFA Competitions
+    "UEFA Champions League": "UCL",
+    "UEFA Europa League": "UEL",
+    "UEFA Europa Conference League": "UECL",
+    "UEFA Conference League": "UECL",
+    "UEFA Nations League": "UNL",
+    "UEFA Super Cup": "USC",
+
+    # International
+    "World Cup": "WC",
+    "Euro Championship": "EURO",
+    "Copa America": "CopaAm",
+    "Africa Cup of Nations": "AFCON",
+    "Asian Cup": "AsianC",
+
+    # CONMEBOL
+    "CONMEBOL Libertadores": "Libert",
+    "CONMEBOL Sudamericana": "Sudam",
+
+    # Other Major Leagues
+    "Scottish Premiership": "SPFL",
+    "Premiership": "SPFL",
+    "Süper Lig": "TurLig",
+    "Allsvenskan": "Allsv",
+    "A-League": "A-Lg",
+
+    # Eastern Europe
+    "Liga I": "L1-RO",  # Romania
+    "Premyer Liqa": "PL-AZ",  # Azerbaijan
+
+    # International Friendlies
+    "Friendlies": "Friend",
+    "Friendlies Clubs": "FriendC",
+}
+
+
+def abbreviate_league(league_name: str, max_length: int = 20) -> str:
+    """Get short abbreviation for league name.
+
+    Uses LEAGUE_ABBREVIATIONS mapping for common leagues,
+    falls back to truncation for unknown leagues.
+
+    Args:
+        league_name: Full league name (e.g., "Premier League", "UEFA Champions League")
+        max_length: Maximum length for unknown leagues (default: 20)
+
+    Returns:
+        Abbreviated league name (3-20 chars)
+
+    Example:
+        >>> abbreviate_league("Premier League")
+        'PL'
+        >>> abbreviate_league("UEFA Champions League")
+        'UCL'
+        >>> abbreviate_league("Some Unknown League")
+        'Some Unknown League'  # truncated to 20 chars if needed
+    """
+    # Check if we have a predefined abbreviation
+    if league_name in LEAGUE_ABBREVIATIONS:
+        return LEAGUE_ABBREVIATIONS[league_name]
+
+    # Fallback: truncate to max_length
+    return league_name[:max_length] if len(league_name) > max_length else league_name
