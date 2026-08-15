@@ -20,6 +20,7 @@ from sipap_common.data.league_mappings import (
     find_league_matches,
     find_similar_leagues,
     get_leagues_for_country,
+    is_generic_country_league_query,
     league_name_to_db_slug,
     resolve_league_alias,
 )
@@ -37,6 +38,7 @@ __all__ = [
     "find_league_matches",
     "find_similar_leagues",
     "get_leagues_for_country",
+    "is_generic_country_league_query",
     "league_name_to_db_slug",
     "resolve_league_alias",
 ]

@@ -848,6 +848,78 @@ def extract_country_from_query(query: str) -> str | None:
     return None
 
 
+def is_generic_country_league_query(query: str) -> tuple[bool, str | None]:
+    """Detect if query is asking for ALL leagues in a country vs specific league.
+
+    CRITICAL DISTINCTION:
+    - "Spanish League/Leagues" → ALL Spanish competitions (generic)
+    - "Spanish La Liga" → ONLY La Liga (specific)
+    - "English league" → ALL English competitions (generic)
+    - "English Premier League" → ONLY Premier League (specific)
+
+    This applies to ALL 77 countries to provide user-friendly behavior:
+    - Casual users: "Show me Spanish league fixtures" → Gets all Spanish leagues
+    - Expert users: "Show me La Liga fixtures" → Gets only La Liga
+
+    Args:
+        query: User's full query
+
+    Returns:
+        Tuple of (is_generic, country_name):
+            - (True, "Spain") if generic "Spanish league/leagues" pattern
+            - (False, None) if specific league mentioned
+
+    Examples:
+        >>> is_generic_country_league_query("Spanish league fixtures")
+        (True, "Spain")
+        >>> is_generic_country_league_query("Spanish leagues today")
+        (True, "Spain")
+        >>> is_generic_country_league_query("Spanish La Liga fixtures")
+        (False, None)
+        >>> is_generic_country_league_query("English league results")
+        (True, "England")
+        >>> is_generic_country_league_query("English Premier League")
+        (False, None)
+        >>> is_generic_country_league_query("Belarus league yesterday")
+        (True, "Belarus")
+    """
+    import re
+
+    query_lower = query.lower()
+
+    # Pattern: [country variant] + league/leagues (with no specific league name after)
+    # Examples: "spanish league", "english leagues", "german league fixtures"
+    # NOT: "spanish la liga", "english premier league"
+
+    # Check each country variant
+    for variant, official_name in COUNTRY_VARIANTS.items():
+        # Pattern: country word followed by "league" or "leagues" with word boundary
+        # Must be followed by non-league-name words (fixtures, results, today, etc.)
+        pattern = rf'\b{re.escape(variant)}\s+leagues?\b(?!\s+\w+\s+(league|cup|division|championship))'
+
+        if re.search(pattern, query_lower):
+            # Found generic pattern - verify no specific league name follows
+            # Extract the part after "league/leagues"
+            league_match = re.search(rf'\b{re.escape(variant)}\s+leagues?\s*(.*)$', query_lower)
+
+            if league_match:
+                remaining = league_match.group(1).strip()
+
+                # Check if remaining text is just action words (not league names)
+                action_words = {
+                    'fixtures', 'results', 'matches', 'today', 'tomorrow',
+                    'yesterday', 'for', 'on', 'this', 'next', 'last',
+                    'week', 'weekend', 'show', 'me', 'get', 'find'
+                }
+
+                # If remaining words are ONLY action words, it's generic
+                remaining_words = set(remaining.split())
+                if not remaining_words or remaining_words.issubset(action_words):
+                    return (True, official_name)
+
+    return (False, None)
+
+
 def find_similar_leagues(
     query: str,
     country: str | None = None,
