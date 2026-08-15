@@ -14,45 +14,28 @@ Used by orchestrator for interpreting user queries like:
 
 # International/continental tournaments (API-Football labels as country="World")
 # These should NOT be filtered by host country (e.g., "World Cup in Qatar" → country=None)
-INTERNATIONAL_TOURNAMENTS: set[str] = {
-    "uefa champions league",
-    "uefa europa league",
-    "uefa europa conference league",
-    "uefa nations league",
-    "uefa super cup",
-    "uefa youth league",
-    "uefa championship - women",
-    "uefa championship - women - qualification",
-    "uefa europa cup - women",
-    "uefa nations league - women",
-    "champions league women",
-    "world cup",
-    "world cup - women",
-    "world cup - qualification",
-    "world cup - u17",
-    "world cup - u20",
-    "euro championship",
-    "euro championship - qualification",
-    "copa america",
-    "africa cup of nations",
-    "asia cup",
-    "asian cup",
-    "concacaf gold cup",
-    "concacaf nations league",
-    "conmebol libertadores",
-    "conmebol sudamericana",
-    "caf champions league",
-    "caf confederation cup",
-    "afc champions league",
-    "concacaf champions league",
-    "fifa club world cup",
-    "fifa intercontinental cup",
-    "confederations cup",
-    "arab cup",
-    "friendlies",
-    "friendlies clubs",
-    "international champions cup",
-}
+# Dynamically built from LEAGUE_REFERENCE for comprehensive coverage
+def _build_international_tournaments() -> set[str]:
+    """Build INTERNATIONAL_TOURNAMENTS from LEAGUE_REFERENCE.
+
+    Returns lowercase set of all international competition names
+    (those with country="World").
+    """
+    # Import here to avoid circular import
+    from sipap_common.data.league_reference import LEAGUE_REFERENCE
+
+    tournaments: set[str] = set()
+    for league in LEAGUE_REFERENCE:
+        if league.get("country") == "World":
+            tournaments.add(league["name"].lower())
+            # Also add aliases
+            for alias in league.get("aliases", []):
+                tournaments.add(alias.lower())
+
+    return tournaments
+
+
+INTERNATIONAL_TOURNAMENTS: set[str] = _build_international_tournaments()
 
 # Country name variants for natural language queries
 # Includes adjectives (Spanish, English, French, etc.) for user-friendly queries
@@ -468,123 +451,34 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
 }
 
 # Competition name aliases and variations
-# Maps common abbreviations/variations to canonical competition names
-LEAGUE_ALIASES: dict[str, str] = {
-    # English Premier League
-    "epl": "Premier League",
-    "premier league": "Premier League",
-    "english premier league": "Premier League",
-    "pl": "Premier League",
+# Dynamically built from LEAGUE_REFERENCE to ensure synchronization
+# Maps all aliases (lowercase) to canonical league names
+def _build_league_aliases() -> dict[str, str]:
+    """Build LEAGUE_ALIASES from LEAGUE_REFERENCE for full coverage.
 
-    # Spanish La Liga
-    "laliga": "La Liga",
-    "la liga": "La Liga",
-    "spanish la liga": "La Liga",
-    "primera division": "La Liga",
+    This ensures string-based lookups work for all 380 competitions
+    without maintaining duplicate alias data.
+    """
+    # Import here to avoid circular import
+    from sipap_common.data.league_reference import LEAGUE_REFERENCE
 
-    # German Bundesliga
-    "bundesliga": "Bundesliga",
-    "german bundesliga": "Bundesliga",
-    "buli": "Bundesliga",
+    aliases: dict[str, str] = {}
 
-    # Italian Serie A
-    "serie a": "Serie A",
-    "italian serie a": "Serie A",
-    "serie b": "Serie B",
+    for league in LEAGUE_REFERENCE:
+        name = league["name"]
+        # Add lowercase league name → canonical name
+        aliases[name.lower()] = name
+        # Add all aliases → canonical name
+        for alias in league.get("aliases", []):
+            aliases[alias.lower()] = name
 
-    # French Ligue 1
-    "ligue 1": "Ligue 1",
-    "ligue 2": "Ligue 2",
-    "french ligue 1": "Ligue 1",
-    "l1": "Ligue 1",
+    # No hardcoded aliases - all aliases come from LEAGUE_REFERENCE
 
-    # UEFA Competitions
-    "champions league": "UEFA Champions League",
-    "ucl": "UEFA Champions League",
-    "uefa champions league": "UEFA Champions League",
-    "europa league": "UEFA Europa League",
-    "uel": "UEFA Europa League",
-    "uefa europa league": "UEFA Europa League",
-    "conference league": "UEFA Europa Conference League",
-    "uecl": "UEFA Europa Conference League",
-    "uefa europa conference league": "UEFA Europa Conference League",
-    "uefa conference league": "UEFA Europa Conference League",
-    "nations league": "UEFA Nations League",
-    "uefa nations league": "UEFA Nations League",
-    "super cup": "UEFA Super Cup",
-    "uefa super cup": "UEFA Super Cup",
+    return aliases
 
-    # International Tournaments
-    "world cup": "World Cup",
-    "euro": "Euro Championship",
-    "euros": "Euro Championship",
-    "euro championship": "Euro Championship",
-    "european championship": "Euro Championship",
-    "copa america": "Copa America",
-    "afcon": "Africa Cup of Nations",
-    "africa cup": "Africa Cup of Nations",
-    "asian cup": "Asian Cup",
-    "gold cup": "CONCACAF Gold Cup",
-    "concacaf gold cup": "CONCACAF Gold Cup",
 
-    # Friendlies
-    "club friendlies": "Friendlies Clubs",
-    "club friendly": "Friendlies Clubs",
-    "friendlies clubs": "Friendlies Clubs",
-    "international friendlies": "Friendlies",
-    "international friendly": "Friendlies",
-    "friendlies": "Friendlies",
-
-    # South American Competitions
-    "libertadores": "CONMEBOL Libertadores",
-    "copa libertadores": "CONMEBOL Libertadores",
-    "sudamericana": "CONMEBOL Sudamericana",
-    "copa sudamericana": "CONMEBOL Sudamericana",
-
-    # National Cups
-    "fa cup": "FA Cup",
-    "english fa cup": "FA Cup",
-    "coupe de france": "Coupe de France",
-    "french cup": "Coupe de France",
-    "copa del rey": "Copa del Rey",
-    "spanish cup": "Copa del Rey",
-    "coppa italia": "Coppa Italia",
-    "italian cup": "Coppa Italia",
-    "dfb pokal": "DFB Pokal",
-    "german cup": "DFB Pokal",
-    "romania cup": "Cupa României",
-    "romanian cup": "Cupa României",
-    "cupa romaniei": "Cupa României",
-    "cupa româniei": "Cupa României",
-    "turkish cup": "Türkiye Kupası",
-    "turkiye kupasi": "Türkiye Kupası",
-    "turkey cup": "Türkiye Kupası",
-    "egyptian cup": "Cup",  # Egypt
-    "belgian cup": "Cup",  # Belgium
-    "croatian cup": "Cup",  # Croatia
-
-    # Other Leagues
-    "eredivisie": "Eredivisie",
-    "dutch league": "Eredivisie",
-    "portuguese liga": "Primeira Liga",
-    "liga nos": "Primeira Liga",
-    "primeira liga": "Primeira Liga",
-    "scottish premiership": "Premiership",
-    "spfl": "Premiership",
-    "mls": "Major League Soccer",
-    "liga mx": "Liga MX",
-    "mexican league": "Liga MX",
-    "j-league": "J1 League",
-    "j league": "J1 League",
-    "j1": "J1 League",
-    "j2": "J2 League",
-    "k-league": "K League 1",
-    "k league": "K League 1",
-    "brazilian serie a": "Serie A",
-    "campeonato brasileiro": "Serie A",
-    "argentinian primera": "Liga Profesional Argentina",
-    "superliga argentina": "Liga Profesional Argentina",
-}
+# Build aliases from LEAGUE_REFERENCE (single source of truth)
+LEAGUE_ALIASES: dict[str, str] = _build_league_aliases()
 
 # Partial name matching patterns (case-insensitive)
 # Used for fuzzy matching when user mentions part of competition name

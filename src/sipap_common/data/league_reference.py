@@ -39,7 +39,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "England",
         "type": "league",
         "tier": 1,
-        "aliases": ["EPL", "English Premier League", "England Premier League", "PL", "Prem"],
+        "aliases": ["EPL", "English Premier League", "England Premier League", "PL", "Prem", "English league"],
         "default_for_ambiguous": True,
     },
     {
@@ -310,7 +310,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "Germany",
         "type": "league",
         "tier": 1,
-        "aliases": ["German Bundesliga", "1. Bundesliga"],
+        "aliases": ["German Bundesliga", "1. Bundesliga", "Buli", "BuLi"],
     },
     {
         "id": 79,
@@ -370,7 +370,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "France",
         "type": "league",
         "tier": 1,
-        "aliases": ["French Ligue 1", "Ligue 1 Uber Eats", "France Ligue 1"],
+        "aliases": ["French Ligue 1", "Ligue 1 Uber Eats", "France Ligue 1", "L1"],
     },
     {
         "id": 62,
@@ -554,7 +554,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "Scotland",
         "type": "league",
         "tier": 1,
-        "aliases": ["Scottish Premiership", "Scottish Premier League", "SPL", "SPFL Premiership"],
+        "aliases": ["Scottish Premiership", "Scottish Premier League", "SPL", "SPFL Premiership", "SPFL"],
     },
     {
         "id": 180,
@@ -2238,7 +2238,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "Japan",
         "type": "league",
         "tier": 1,
-        "aliases": ["J.League Division 1", "J-League"],
+        "aliases": ["J.League Division 1", "J-League", "J League", "J1", "Japanese J League"],
     },
     {
         "id": 99,
@@ -2246,7 +2246,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "Japan",
         "type": "league",
         "tier": 2,
-        "aliases": ["J.League Division 2"],
+        "aliases": ["J.League Division 2", "J2", "Japanese J2 League"],
     },
     {
         "id": 100,
@@ -2282,7 +2282,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "South-Korea",
         "type": "league",
         "tier": 1,
-        "aliases": ["Korean K League 1", "K-League"],
+        "aliases": ["Korean K League 1", "K-League", "K League", "Korean league"],
     },
     {
         "id": 293,
@@ -2878,7 +2878,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "World",
         "type": "cup",
         "tier": 1,
-        "aliases": ["European Championship", "Euros", "UEFA Euro"],
+        "aliases": ["European Championship", "Euros", "UEFA Euro", "Euro"],
     },
     {
         "id": 960,
