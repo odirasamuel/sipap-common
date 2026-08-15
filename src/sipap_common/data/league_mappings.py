@@ -12,6 +12,149 @@ Used by orchestrator for interpreting user queries like:
 - "Cupa României" → Cupa României (Romania Cup)
 """
 
+# Country name variants for natural language queries
+# Includes adjectives (Spanish, English, French, etc.) for user-friendly queries
+# Comprehensive list covering 77 countries
+COUNTRY_VARIANTS: dict[str, str] = {
+    # Europe
+    "albania": "Albania",
+    "albanian": "Albania",
+    "andorra": "Andorra",
+    "andorran": "Andorra",
+    "armenia": "Armenia",
+    "armenian": "Armenia",
+    "austria": "Austria",
+    "austrian": "Austria",
+    "spanish": "Spain",  # "Spanish LaLiga"
+    "english": "England",  # "English Premier League"
+    "french": "France",  # "French Ligue 1"
+    "german": "Germany",  # "German Bundesliga"
+    "italian": "Italy",  # "Italian Serie A"
+    "portuguese": "Portugal",  # "Portuguese Liga"
+    "dutch": "Netherlands",  # "Dutch Eredivisie"
+    "belgian": "Belgium",  # "Belgian Pro League"
+    "turkish": "Turkey",  # "Turkish Super Lig"
+    "greek": "Greece",  # "Greek Super League"
+    "scottish": "Scotland",  # "Scottish Premiership"
+    "welsh": "Wales",  # "Welsh Premier League"
+    "irish": "Ireland",  # "Irish Premier Division"
+    "azerbaijan": "Azerbaijan",
+    "belarus": "Belarus",
+    "belgium": "Belgium",
+    "bosnia": "Bosnia-and-Herzegovina",
+    "bosnia-herzegovina": "Bosnia-and-Herzegovina",
+    "bulgaria": "Bulgaria",
+    "croatia": "Croatia",
+    "cyprus": "Cyprus",
+    "czech": "Czech-Republic",
+    "denmark": "Denmark",
+    "england": "England",
+    "estonia": "Estonia",
+    "faroe": "Faroe-Islands",
+    "finland": "Finland",
+    "france": "France",
+    "georgia": "Georgia",
+    "germany": "Germany",
+    "gibraltar": "Gibraltar",
+    "greece": "Greece",
+    "hungary": "Hungary",
+    "iceland": "Iceland",
+    "ireland": "Ireland",
+    "israel": "Israel",
+    "italy": "Italy",
+    "kosovo": "Kosovo",
+    "latvia": "Latvia",
+    "liechtenstein": "Liechtenstein",
+    "lithuania": "Lithuania",
+    "luxembourg": "Luxembourg",
+    "malta": "Malta",
+    "moldova": "Moldova",
+    "montenegro": "Montenegro",
+    "netherlands": "Netherlands",
+    "norway": "Norway",
+    "poland": "Poland",
+    "portugal": "Portugal",
+    "romania": "Romania",
+    "russia": "Russia",
+    "san-marino": "San-Marino",
+    "scotland": "Scotland",
+    "serbia": "Serbia",
+    "slovakia": "Slovakia",
+    "slovenia": "Slovenia",
+    "spain": "Spain",
+    "sweden": "Sweden",
+    "switzerland": "Switzerland",
+    "turkey": "Turkey",
+    "ukraine": "Ukraine",
+    "wales": "Wales",
+    # Americas
+    "argentina": "Argentina",
+    "argentinian": "Argentina",
+    "bolivian": "Bolivia",
+    "bolivia": "Bolivia",
+    "brazil": "Brazil",
+    "brazilian": "Brazil",
+    "canada": "Canada",
+    "canadian": "Canada",
+    "chile": "Chile",
+    "chilean": "Chile",
+    "colombia": "Colombia",
+    "colombian": "Colombia",
+    "costa-rica": "Costa-Rica",
+    "costa-rican": "Costa-Rica",
+    "ecuador": "Ecuador",
+    "ecuadorian": "Ecuador",
+    "jamaica": "Jamaica",
+    "jamaican": "Jamaica",
+    "mexico": "Mexico",
+    "mexican": "Mexico",
+    "paraguay": "Paraguay",
+    "paraguayan": "Paraguay",
+    "peru": "Peru",
+    "peruvian": "Peru",
+    "usa": "USA",
+    "united-states": "USA",
+    "american": "USA",
+    "uruguay": "Uruguay",
+    "uruguayan": "Uruguay",
+    "venezuela": "Venezuela",
+    "venezuelan": "Venezuela",
+    # Asia
+    "australia": "Australia",
+    "bahrain": "Bahrain",
+    "china": "China",
+    "india": "India",
+    "indonesia": "Indonesia",
+    "iran": "Iran",
+    "iraq": "Iraq",
+    "japan": "Japan",
+    "jordan": "Jordan",
+    "kuwait": "Kuwait",
+    "malaysia": "Malaysia",
+    "qatar": "Qatar",
+    "saudi": "Saudi-Arabia",
+    "saudi-arabia": "Saudi-Arabia",
+    "singapore": "Singapore",
+    "south-korea": "South-Korea",
+    "korea": "South-Korea",
+    "thailand": "Thailand",
+    "uae": "UAE",
+    "vietnam": "Vietnam",
+    # Africa
+    "algeria": "Algeria",
+    "egypt": "Egypt",
+    "ghana": "Ghana",
+    "kenya": "Kenya",
+    "morocco": "Morocco",
+    "nigeria": "Nigeria",
+    "south-africa": "South-Africa",
+    "tunisia": "Tunisia",
+    "uganda": "Uganda",
+    "zambia": "Zambia",
+    "zimbabwe": "Zimbabwe",
+}
+
+
 # Country to leagues mapping (all countries with their competitions)
 COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
     # A
@@ -629,3 +772,129 @@ def league_name_to_db_slug(league_name: str) -> str | None:
         'cupa-romaniei'
     """
     return LEAGUE_NAME_TO_DB_SLUG.get(league_name)
+
+
+def extract_country_from_query(query: str) -> str | None:
+    """Extract country name from user query.
+
+    Uses comprehensive COUNTRY_VARIANTS mapping (77 countries + adjectives)
+    to identify country context in natural language queries.
+
+    Args:
+        query: User's query (e.g., "Spanish LaLiga fixtures", "Belarus league results")
+
+    Returns:
+        Official country name (e.g., "Spain", "Belarus") or None if not found
+
+    Example:
+        >>> extract_country_from_query("Spanish LaLiga fixtures")
+        'Spain'
+        >>> extract_country_from_query("Belarus league results")
+        'Belarus'
+        >>> extract_country_from_query("English Premier League")
+        'England'
+        >>> extract_country_from_query("Show me fixtures")
+        None
+    """
+    query_lower = query.lower()
+
+    # Search for country variants in query
+    for variant, official_name in COUNTRY_VARIANTS.items():
+        if variant in query_lower:
+            return official_name
+
+    return None
+
+
+def find_similar_leagues(
+    query: str,
+    country: str | None = None,
+    max_suggestions: int = 5,
+) -> list[dict[str, str]]:
+    """Find similar league names using fuzzy matching.
+
+    Uses string similarity to suggest leagues when exact match fails.
+    Useful for typos, partial names, or alternative phrasings.
+
+    Args:
+        query: User's league query (e.g., "spanis liga", "premere league")
+        country: Optional country filter to narrow suggestions
+        max_suggestions: Maximum number of suggestions to return (default: 5)
+
+    Returns:
+        List of suggestions with format and score:
+            [
+                {"league": "La Liga", "country": "Spain", "score": 85},
+                {"league": "Premier League", "country": "England", "score": 75},
+                ...
+            ]
+
+    Example:
+        >>> suggestions = find_similar_leagues("spanis liga")
+        >>> suggestions[0]["league"]
+        'La Liga'
+        >>> suggestions[0]["country"]
+        'Spain'
+    """
+    from difflib import SequenceMatcher
+
+    query_lower = query.lower()
+    suggestions = []
+
+    # Score function: simple string similarity
+    def similarity_score(s1: str, s2: str) -> int:
+        """Calculate similarity score (0-100) between two strings."""
+        return int(SequenceMatcher(None, s1.lower(), s2.lower()).ratio() * 100)
+
+    # Search in LEAGUE_ALIASES (comprehensive list of all league names and aliases)
+    for alias, canonical in LEAGUE_ALIASES.items():
+        alias_lower = alias.lower()
+
+        # Skip if too short to match
+        if len(query_lower) < 3 or len(alias_lower) < 3:
+            continue
+
+        # Calculate similarity
+        score = similarity_score(query_lower, alias_lower)
+
+        # Also check substring matching for phrases like "spanish la liga"
+        if query_lower in alias_lower or alias_lower in query_lower:
+            score = max(score, 75)  # Boost substring matches
+
+        # Only suggest if similarity >= 60%
+        if score >= 60:
+            # Determine country for this league (if possible)
+            league_country = None
+            if country:
+                # If country filter provided, only include leagues from that country
+                if country.lower() in COUNTRY_TO_LEAGUES:
+                    if canonical not in COUNTRY_TO_LEAGUES[country.lower()]:
+                        continue  # Skip leagues not in this country
+                    league_country = country
+            else:
+                # Try to find which country this league belongs to
+                for c, leagues in COUNTRY_TO_LEAGUES.items():
+                    if canonical in leagues:
+                        league_country = c.title()
+                        break
+
+            suggestions.append({
+                "league": canonical,
+                "country": league_country or "International",
+                "score": score,
+                "alias_matched": alias,
+            })
+
+    # Sort by score (highest first) and deduplicate by canonical name
+    suggestions.sort(key=lambda x: x["score"], reverse=True)
+
+    # Deduplicate: keep only the highest-scoring match for each canonical league
+    seen_leagues = set()
+    unique_suggestions = []
+    for s in suggestions:
+        if s["league"] not in seen_leagues:
+            seen_leagues.add(s["league"])
+            unique_suggestions.append(s)
+
+    # Return top N suggestions
+    return unique_suggestions[:max_suggestions]
