@@ -32,6 +32,7 @@ from sipap_common.data.league_reference import (
     get_league_by_id,
     get_league_reference_for_prompt,
     get_leagues_for_country_by_id,
+    get_sports_context_keywords,
     resolve_league_query,
 )
 
@@ -58,5 +59,6 @@ __all__ = [
     "get_league_by_id",
     "get_league_reference_for_prompt",
     "get_leagues_for_country_by_id",
+    "get_sports_context_keywords",
     "resolve_league_query",
 ]

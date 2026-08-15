@@ -728,6 +728,55 @@ def get_country_league_ids(country: str) -> list[int]:
     return [league["id"] for league in leagues]
 
 
+def get_sports_context_keywords() -> set[str]:
+    """Get all unique keywords for sports context detection.
+
+    Dynamically extracts ALL keywords from LEAGUE_REFERENCE - no hardcoding.
+    Returns lowercase keywords for case-insensitive matching.
+
+    Extracts:
+    - All league names and their words
+    - All country names from the reference
+    - All aliases and their words
+
+    Returns:
+        Set of lowercase keywords
+
+    Example:
+        >>> keywords = get_sports_context_keywords()
+        >>> "laliga" in keywords
+        True
+        >>> "spain" in keywords
+        True
+    """
+    keywords: set[str] = set()
+
+    for league in LEAGUE_REFERENCE:
+        # Add league name (full and split into words)
+        name = league.get("name", "")
+        if name:
+            keywords.add(name.lower())
+            for word in name.lower().split():
+                if len(word) > 2:  # Skip short words like "fc", "de"
+                    keywords.add(word)
+
+        # Add country (directly from LEAGUE_REFERENCE - no hardcoded mapping)
+        country = league.get("country", "")
+        if country:
+            keywords.add(country.lower())
+
+        # Add aliases (full and split into words)
+        aliases = league.get("aliases", [])
+        for alias in aliases:
+            if alias:
+                keywords.add(alias.lower())
+                for word in alias.lower().split():
+                    if len(word) > 2:
+                        keywords.add(word)
+
+    return keywords
+
+
 # Export public API
 __all__ = [
     "LEAGUE_REFERENCE",
@@ -736,4 +785,5 @@ __all__ = [
     "resolve_league_query",
     "get_league_reference_for_prompt",
     "get_country_league_ids",
+    "get_sports_context_keywords",
 ]
