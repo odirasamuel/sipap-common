@@ -39,8 +39,9 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "EPL", "English Premier League", "English league",
+            "EPL", "English Premier League",
             "England Premier League", "PL", "Prem",
+            # Note: "English league" removed - generic, should return ALL English leagues
         ],
         "disambiguation": "Top tier English football - world's most watched league",
         "default_for_ambiguous": True,  # If "Premier League" alone, default to this
@@ -99,9 +100,11 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "LaLiga", "Spanish LaLiga", "Spanish La Liga", "Spanish league",
+            "LaLiga", "Spanish LaLiga", "Spanish La Liga",
             "La Liga Santander", "LaLiga EA Sports", "Primera División",
-            "Spain league", "Spain La Liga",
+            "Spain La Liga",
+            # Note: "Spanish league" and "Spain league" removed - those are generic
+            # and should return ALL Spanish leagues, not just La Liga
         ],
         "disambiguation": "Top tier Spanish football",
         "default_for_ambiguous": True,
@@ -133,8 +136,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Italian Serie A", "Italian league", "Italy league",
-            "Serie A TIM", "Italy Serie A",
+            "Italian Serie A", "Serie A TIM", "Italy Serie A",
+            # Note: "Italian league", "Italy league" removed - generic
         ],
         "disambiguation": "Top tier Italian football",
         "default_for_ambiguous": True,  # If "Serie A" alone without Brazil context
@@ -166,8 +169,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "German Bundesliga", "German league", "Germany league",
-            "1. Bundesliga",
+            "German Bundesliga", "1. Bundesliga",
+            # Note: "German league", "Germany league" removed - generic
         ],
         "disambiguation": "Top tier German football",
     },
@@ -198,8 +201,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "French Ligue 1", "French league", "France league",
-            "Ligue 1 Uber Eats", "France Ligue 1",
+            "French Ligue 1", "Ligue 1 Uber Eats", "France Ligue 1",
+            # Note: "French league", "France league" removed - generic
         ],
         "disambiguation": "Top tier French football",
     },
@@ -230,8 +233,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Portuguese Primeira Liga", "Portuguese league", "Portugal league",
-            "Liga Portugal", "Liga NOS", "Portugal Primeira Liga",
+            "Portuguese Primeira Liga", "Liga Portugal", "Liga NOS", "Portugal Primeira Liga",
+            # Note: "Portuguese league", "Portugal league" removed - generic
         ],
         "disambiguation": "Top tier Portuguese football",
     },
@@ -244,8 +247,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Dutch Eredivisie", "Dutch league", "Netherlands league",
-            "Holland league",
+            "Dutch Eredivisie",
+            # Note: "Dutch league", "Netherlands league", "Holland league" removed - generic
         ],
         "disambiguation": "Top tier Dutch football",
     },
@@ -299,8 +302,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Belarus Premier League", "Belarusian Premier League",
-            "Vysshaya Liga", "Belarus league", "Belarusian league",
+            "Belarus Premier League", "Belarusian Premier League", "Vysshaya Liga",
+            # Note: "Belarus league", "Belarusian league" removed - generic
         ],
         "disambiguation": "Top tier Belarusian football",
     },
@@ -313,8 +316,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Wales Premier League", "Welsh Premier League", "Welsh league",
-            "Wales league",
+            "Wales Premier League", "Welsh Premier League",
+            # Note: "Welsh league", "Wales league" removed - generic
         ],
         "disambiguation": "Top tier Welsh football",
     },
@@ -328,7 +331,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "tier": 1,
         "aliases": [
             "Scottish Premiership", "Scottish Premier League", "SPL",
-            "Scotland league", "Scottish league",
+            # Note: "Scotland league", "Scottish league" removed - generic
         ],
         "disambiguation": "Top tier Scottish football",
     },
@@ -341,8 +344,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Belgian Pro League", "Belgian league", "Belgium league",
-            "First Division A",
+            "Belgian Pro League", "First Division A",
+            # Note: "Belgian league", "Belgium league" removed - generic
         ],
         "disambiguation": "Top tier Belgian football",
     },
@@ -355,8 +358,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Turkish Super Lig", "Turkish league", "Turkey league",
-            "Super Lig",
+            "Turkish Super Lig", "Super Lig",
+            # Note: "Turkish league", "Turkey league" removed - generic
         ],
         "disambiguation": "Top tier Turkish football",
     },
@@ -369,7 +372,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Greek Super League", "Greek league", "Greece league",
+            "Greek Super League",
+            # Note: "Greek league", "Greece league" removed - generic
         ],
         "disambiguation": "Top tier Greek football",
     },
@@ -386,8 +390,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Brazilian Serie A", "Brasileirão", "Brazilian league",
-            "Brazil league", "Brazil Serie A",
+            "Brazilian Serie A", "Brasileirão", "Brazil Serie A",
+            # Note: "Brazilian league", "Brazil league" removed - generic
         ],
         "disambiguation": "Top tier Brazilian football",
     },
@@ -400,8 +404,8 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "type": "league",
         "tier": 1,
         "aliases": [
-            "Argentine Primera División", "Argentine league",
-            "Argentina league", "Liga Argentina",
+            "Argentine Primera División", "Liga Argentina",
+            # Note: "Argentine league", "Argentina league" removed - generic
         ],
         "disambiguation": "Top tier Argentine football",
     },
