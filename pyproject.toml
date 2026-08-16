@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sipap-common"
-version = "0.1.0"
+version = "0.1.1"
 description = "Shared utilities for SIPAP platform"
 readme = "README.md"
 authors = [{name = "SIPAP Team", email = "dev@sipap.io"}]
