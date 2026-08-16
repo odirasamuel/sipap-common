@@ -1104,44 +1104,110 @@ def get_leagues_for_country_by_id(country: str) -> list[dict[str, Any]]:
 def resolve_league_query(query: str) -> list[dict[str, Any]]:
     """
     Resolve a user query to matching leagues.
-    
+
     Args:
         query: User input like "La Liga", "Spanish league", "EPL"
-    
+
     Returns:
         List of matching league dicts with API-Football IDs
     """
     query_lower = query.lower().strip()
-    
+
     # Check for exact alias match first
     for league in LEAGUE_REFERENCE:
         aliases = league.get("aliases", [])
         if query_lower in [a.lower() for a in aliases]:
             return [league]
-    
+
     # Check for name match
     for league in LEAGUE_REFERENCE:
         if query_lower == league["name"].lower():
             return [league]
-    
+
     # Check for partial name match
     matches = []
     for league in LEAGUE_REFERENCE:
         if query_lower in league["name"].lower():
             matches.append(league)
-    
+
     if matches:
         return matches
-    
+
     # Check for country match
     country_leagues = get_leagues_for_country_by_id(query_lower)
     if country_leagues:
         return country_leagues
-    
+
     # Check for "[country] league" pattern
     for country in _LEAGUES_BY_COUNTRY.keys():
         if f"{country} league" in query_lower or f"{country}n league" in query_lower:
             return _LEAGUES_BY_COUNTRY[country]
-    
+
     return []
+
+
+def get_country_league_ids(country: str) -> list[int]:
+    """
+    Get all league IDs for a country.
+
+    Args:
+        country: Country name (e.g., "Spain", "England", "Brazil")
+
+    Returns:
+        List of API-Football league IDs for the country
+    """
+    leagues = get_leagues_for_country_by_id(country)
+    return [league["id"] for league in leagues]
+
+
+def get_league_reference_for_prompt() -> str:
+    """
+    Get formatted league reference for LLM prompts.
+
+    Returns:
+        Formatted string listing all leagues by country for prompt injection
+    """
+    lines = ["Available leagues by country:\n"]
+
+    # Group by country
+    for country in sorted(_LEAGUES_BY_COUNTRY.keys()):
+        leagues = _LEAGUES_BY_COUNTRY[country]
+        league_names = [f"{l['name']} (ID: {l['id']})" for l in leagues]
+        lines.append(f"{country.title()}: {', '.join(league_names)}")
+
+    return "\n".join(lines)
+
+
+def get_sports_context_keywords() -> list[str]:
+    """
+    Get keywords that indicate sports/football context.
+
+    Returns:
+        List of keywords for context detection
+    """
+    keywords = [
+        # Match/fixture related
+        "fixture", "fixtures", "match", "matches", "game", "games",
+        "result", "results", "score", "scores", "standings", "table",
+        # Prediction related
+        "prediction", "predictions", "predict", "odds", "bet", "betting",
+        # Time related
+        "today", "tomorrow", "weekend", "tonight", "this week",
+        # Competition types
+        "league", "cup", "championship", "tournament", "derby",
+        # Actions
+        "playing", "plays", "vs", "versus", "against",
+    ]
+
+    # Add all league names and aliases
+    for league in LEAGUE_REFERENCE:
+        keywords.append(league["name"].lower())
+        for alias in league.get("aliases", []):
+            keywords.append(alias.lower())
+
+    # Add all country names
+    keywords.extend(_LEAGUES_BY_COUNTRY.keys())
+    keywords.extend(_COUNTRY_VARIANTS.keys())
+
+    return list(set(keywords))
 
