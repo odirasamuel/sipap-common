@@ -53,16 +53,22 @@ class RedisCache:
             self.redis_client = redis_client
         else:
             try:
-                # Create connection pool for better performance
-                pool = redis.ConnectionPool(
-                    host=host,
-                    port=port,
-                    db=db,
-                    password=password,
-                    max_connections=max_connections,
-                    decode_responses=False,  # We'll handle encoding/decoding
-                    ssl=ssl,
-                )
+                # Build connection pool kwargs
+                pool_kwargs: dict[str, Any] = {
+                    "host": host,
+                    "port": port,
+                    "db": db,
+                    "password": password,
+                    "max_connections": max_connections,
+                    "decode_responses": False,  # We'll handle encoding/decoding
+                }
+
+                # Add SSL parameters only when SSL is enabled
+                if ssl:
+                    pool_kwargs["ssl"] = True
+                    pool_kwargs["ssl_cert_reqs"] = None  # Skip cert verification for ElastiCache
+
+                pool = redis.ConnectionPool(**pool_kwargs)
                 self.redis_client = redis.Redis(connection_pool=pool)
             except Exception as e:
                 raise CacheError(f"Failed to initialize Redis client: {e}")
