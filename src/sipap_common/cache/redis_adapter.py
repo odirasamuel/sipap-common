@@ -30,6 +30,7 @@ class RedisCache:
         default_ttl: int = 300,
         max_connections: int = 50,
         redis_client: Any | None = None,
+        ssl: bool = False,
     ) -> None:
         """Initialize Redis cache.
 
@@ -41,6 +42,7 @@ class RedisCache:
             default_ttl: Default time-to-live in seconds (default 300 = 5 minutes)
             max_connections: Maximum connections in pool
             redis_client: Optional Redis client for testing
+            ssl: Enable SSL/TLS connection (required for ElastiCache serverless)
 
         Raises:
             CacheError: If Redis initialization fails
@@ -59,6 +61,7 @@ class RedisCache:
                     password=password,
                     max_connections=max_connections,
                     decode_responses=False,  # We'll handle encoding/decoding
+                    ssl=ssl,
                 )
                 self.redis_client = redis.Redis(connection_pool=pool)
             except Exception as e:
