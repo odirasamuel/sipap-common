@@ -1113,21 +1113,22 @@ def resolve_league_query(query: str) -> list[dict[str, Any]]:
     """
     query_lower = query.lower().strip()
 
-    # Check for exact alias match first
+    # Check for exact alias match first (alias found IN query)
     for league in LEAGUE_REFERENCE:
         aliases = league.get("aliases", [])
-        if query_lower in [a.lower() for a in aliases]:
+        # Check if any alias appears in the query (not vice versa)
+        if any(a.lower() in query_lower for a in aliases):
             return [league]
 
-    # Check for name match
+    # Check for name match (league name found IN query)
     for league in LEAGUE_REFERENCE:
-        if query_lower == league["name"].lower():
+        if league["name"].lower() in query_lower:
             return [league]
 
-    # Check for partial name match
+    # Check for partial name match (league name found IN query)
     matches = []
     for league in LEAGUE_REFERENCE:
-        if query_lower in league["name"].lower():
+        if league["name"].lower() in query_lower:
             matches.append(league)
 
     if matches:
