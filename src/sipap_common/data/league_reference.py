@@ -911,6 +911,37 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "tier": 1,
     },
     # ============================================================
+    # ARMENIA
+    # ============================================================
+    {
+        "id": 342,
+        "name": "Premier League",
+        "country": "Armenia",
+        "type": "league",
+        "tier": 1,
+    },
+    {
+        "id": 343,
+        "name": "First League",
+        "country": "Armenia",
+        "type": "league",
+        "tier": 2,
+    },
+    {
+        "id": 654,
+        "name": "Super Cup",
+        "country": "Armenia",
+        "type": "cup",
+        "tier": 1,
+    },
+    {
+        "id": 709,
+        "name": "Cup",
+        "country": "Armenia",
+        "type": "cup",
+        "tier": 1,
+    },
+    # ============================================================
     # AUSTRALIA
     # ============================================================
     {
