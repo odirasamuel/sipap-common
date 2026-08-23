@@ -2965,10 +2965,16 @@ def resolve_league_query(query: str) -> list[dict[str, Any]]:
     if matches:
         return matches
 
-    # Check for country match
-    country_leagues = get_leagues_for_country_by_id(query_lower)
-    if country_leagues:
-        return country_leagues
+    # Check for country name IN query (e.g., "Azerbaijan Today" contains "azerbaijan")
+    # Check both _LEAGUES_BY_COUNTRY keys and _COUNTRY_VARIANTS keys
+    for country in _LEAGUES_BY_COUNTRY.keys():
+        if country in query_lower:
+            return _LEAGUES_BY_COUNTRY[country]
+
+    # Check country variants (e.g., "usa", "holland", "uk")
+    for variant, normalized in _COUNTRY_VARIANTS.items():
+        if variant in query_lower:
+            return _LEAGUES_BY_COUNTRY.get(normalized, [])
 
     # Check for "[country] league" pattern
     for country in _LEAGUES_BY_COUNTRY.keys():
