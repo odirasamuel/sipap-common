@@ -192,15 +192,17 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
         "Copa de la Superliga",
         "Copa Argentina",
         "Primera Nacional",
+        "Primera B Metropolitana",
+        "Primera C",
     ],
-    "armenia": ["Premier League", "Super Cup", "Cup"],
-    "australia": ["A-League"],
+    "armenia": ["Premier League", "First League", "Super Cup", "Cup"],
+    "australia": ["A-League", "A-League Women", "Capital Territory NPL"],
     "austria": ["Bundesliga", "2. Liga", "Cup"],
     "azerbaijan": ["Premyer Liqa", "Cup"],
 
     # B
     "belarus": ["Premier League", "1. Division", "Coppa", "Super Cup"],
-    "belgium": ["Jupiler Pro League", "Challenger Pro League", "Cup", "Super Cup"],
+    "belgium": ["Jupiler Pro League", "Challenger Pro League", "Cup", "Super Cup", "Super League Women"],
     "bolivia": ["Primera División", "Copa de la División Profesional"],
     "bosnia": ["Premijer Liga", "Cup", "Super Cup"],
     "brazil": [
@@ -210,6 +212,11 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
         "Serie D",
         "Supercopa do Brasil",
         "Copa Do Brasil",
+        "Brasileiro Women",
+        "Paulista - A1",
+        "Paulista - A2",
+        "Gaúcho - 1",
+        "Gaúcho - 2",
     ],
     "bulgaria": ["First League", "Second League", "Cup", "Super Cup"],
 
@@ -283,7 +290,7 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
         "Frauen Bundesliga",
         "DFB Pokal - Women",
     ],
-    "greece": ["Super League 1", "Super League 2", "Super Cup", "Cup"],
+    "greece": ["Super League 1", "Super League 2", "Football League", "Super Cup", "Cup"],
 
     # H
     "honduras": ["Liga Nacional"],
@@ -315,7 +322,7 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
     ],
 
     # J
-    "japan": ["J1 League", "J2 League", "J-League Cup", "Emperor Cup", "Super Cup"],
+    "japan": ["J1 League", "J2 League", "J3 League", "J-League Cup", "Emperor Cup", "Super Cup"],
 
     # K
     "kazakhstan": ["Premier League", "1. Division", "Cup", "Super Cup"],
@@ -326,7 +333,7 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
 
     # M
     "malaysia": ["Super League", "Premier League", "Malaysia Cup", "FA Cup"],
-    "mexico": ["Liga MX", "Copa por México", "Copa MX", "Campeón de Campeones"],
+    "mexico": ["Liga MX", "Liga de Expansión MX", "Copa por México", "Copa MX", "Campeón de Campeones"],
     "moldova": ["Super Liga", "Cupa"],
     "morocco": ["Botola Pro", "Botola 2", "Cup"],
 
@@ -357,7 +364,7 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
         "Copa De La Liga",
         "Copa Perú",
     ],
-    "poland": ["Ekstraklasa", "I Liga", "Cup", "Super Cup"],
+    "poland": ["Ekstraklasa", "I Liga", "II Liga - East", "Cup", "Super Cup"],
     "portugal": [
         "Primeira Liga",
         "Segunda Liga",
@@ -426,11 +433,11 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
     # T
     "thailand": ["Thai League 1", "FA Cup", "League Cup"],
     "tunisia": ["Ligue 1", "Ligue 2", "Super Cup", "Cup"],
-    "turkey": ["Süper Lig", "1. Lig", "Türkiye Kupası", "Super Cup"],
+    "turkey": ["Süper Lig", "1. Lig", "2. Lig", "Türkiye Kupası", "Super Cup"],
 
     # U
-    "usa": ["Major League Soccer"],
-    "united states": ["Major League Soccer"],
+    "usa": ["Major League Soccer", "USL Championship", "USL League Two", "NWSL Women", "US Open Cup"],
+    "united states": ["Major League Soccer", "USL Championship", "USL League Two", "NWSL Women", "US Open Cup"],
     "ukraine": ["Premier League", "Persha Liga", "Cup", "Super Cup"],
     "united-arab-emirates": ["Pro League", "League Cup", "Super Cup"],
     "united arab emirates": ["Pro League", "League Cup", "Super Cup"],
