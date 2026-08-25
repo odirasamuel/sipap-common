@@ -31,7 +31,7 @@ The sipap-common package is **fully compatible** with Python 3.12, 3.13, and 3.1
 
 ### 1. exceptions.py
 ```python
-class SIPAPException(Exception):
+class ValoException(Exception):
     pass
 ```
 - **Uses:** Basic exception inheritance (Python 2.x+)

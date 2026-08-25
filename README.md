@@ -1,6 +1,6 @@
 # sipap-common
 
-Shared utilities for the SIPAP (Sports Intelligence Platform and Outcome Probability Assessment Platform).
+Shared utilities for the Valo (Sports Intelligence Platform and Outcome Probability Assessment Platform).
 
 [![Python Version](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/downloads/)
 [![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](./htmlcov/index.html)
@@ -9,7 +9,7 @@ Shared utilities for the SIPAP (Sports Intelligence Platform and Outcome Probabi
 
 ## Overview
 
-`sipap-common` provides core utilities used across all SIPAP components:
+`sipap-common` provides core utilities used across all Valo components:
 
 - **Config Loader**: Jinja2-based YAML configuration with environment variable substitution
 - **Structured Logger**: JSON-formatted logging with ContextVar-based context propagation
@@ -436,4 +436,4 @@ config = load_config("config.yml")
 
 ## License
 
-Copyright © 2026 SIPAP Team
+Copyright © 2026 Valo Team

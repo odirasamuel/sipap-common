@@ -1,4 +1,4 @@
-# SIPAP Common Examples
+# Valo Common Examples
 
 This directory contains comprehensive working examples demonstrating the key features implemented in sipap-common following Sentinel patterns.
 

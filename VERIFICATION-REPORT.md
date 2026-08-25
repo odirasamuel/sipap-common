@@ -1,4 +1,4 @@
-# SIPAP Common - Verification Report
+# Valo Common - Verification Report
 
 **Generated:** 2026-07-05  
 **Package Version:** 0.1.0  
@@ -136,7 +136,7 @@ session.execute(text("INSERT INTO predictions (match_id, data) VALUES ('M001', '
 
 **Modules Verified:**
 - `telemetry` (TelemetryRecord, now_iso, calculate_processing_time_ms, float_to_decimal, prediction_status_to_telemetry)
-- `exceptions` (SIPAPException with telemetry support, all subclasses)
+- `exceptions` (ValoException with telemetry support, all subclasses)
 - `utils.template` (create_jinja_env, render_template)
 - All AWS clients (DynamoDB, S3, Lambda, SQS, EventBridge)
 - All existing utilities (cache, database, logging, types)
@@ -195,16 +195,16 @@ Demonstrates Jinja2 template rendering for configuration management:
 
 ### Pattern #13: Fire-and-Forget Telemetry (DynamoDB)
 **Implementation:** `src/sipap_common/aws/dynamodb.py`
-- `SIPAPTelemetryPublisher` class with async-compatible publishing
+- `ValoTelemetryPublisher` class with async-compatible publishing
 - Never blocks predictions (errors logged but not raised)
-- Environment variable toggle: `SIPAP_TELEMETRY_ENABLED`
+- Environment variable toggle: `Valo_TELEMETRY_ENABLED`
 - Batch publishing support for efficiency
 
 **Test Coverage:** 100% (12 tests)
 
 ### Pattern #14: Exception-Carried Telemetry
 **Implementation:** `src/sipap_common/exceptions.py`
-- Base `SIPAPException` with optional `telemetry_record` parameter
+- Base `ValoException` with optional `telemetry_record` parameter
 - `has_telemetry()` and `get_telemetry()` methods
 - All subclasses support telemetry (DatabaseError, CacheError, ValidationError, etc.)
 - Backward compatible (telemetry optional)
@@ -268,7 +268,7 @@ sipap-common **PASSES** all quality gates with:
 - ✅ All imports successful
 - ✅ 3 comprehensive working examples provided
 
-The package is **production-ready** for SIPAP development. The 9% coverage gap is concentrated in error handling paths for AWS service failures and edge cases, which are non-critical for MVP.
+The package is **production-ready** for Valo development. The 9% coverage gap is concentrated in error handling paths for AWS service failures and edge cases, which are non-critical for MVP.
 
 **Sentinel Pattern Adoption Status:** Patterns #13-15 successfully implemented and tested.
 
