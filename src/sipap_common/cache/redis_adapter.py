@@ -181,6 +181,80 @@ class RedisCache:
         except Exception as e:
             raise CacheError(f"Failed to clear cache: {e}")
 
+    def scan_keys(self, pattern: str) -> list[str]:
+        """Return all keys matching a glob pattern using SCAN (non-blocking).
+
+        Uses Redis SCAN instead of KEYS to avoid blocking the server on large
+        datasets. Safe for production use.
+
+        Args:
+            pattern: Redis glob pattern (e.g., "prediction:*", "sipap:api:*")
+
+        Returns:
+            List of matching key strings
+
+        Raises:
+            CacheError: If scan operation fails
+
+        Examples:
+            >>> cache = RedisCache()
+            >>> keys = cache.scan_keys("prediction:*:*:2026-09-19")
+            >>> print(f"Found {len(keys)} prediction keys")
+        """
+        try:
+            matching_keys: list[str] = []
+            cursor = 0
+            while True:
+                cursor, keys = self.redis_client.scan(cursor, match=pattern, count=100)
+                for key in keys:
+                    matching_keys.append(key.decode() if isinstance(key, bytes) else key)
+                if cursor == 0:
+                    break
+            return matching_keys
+        except Exception as e:
+            raise CacheError(f"Failed to scan keys with pattern '{pattern}': {e}")
+
+    def delete_pattern(self, pattern: str, dry_run: bool = False) -> int:
+        """Delete all keys matching a glob pattern.
+
+        Uses SCAN to find keys (non-blocking, safe for production), then
+        deletes them in batches. Returns the count of deleted keys.
+
+        Args:
+            pattern: Redis glob pattern (e.g., "prediction:*:*:2026-09-19")
+            dry_run: If True, count matching keys but do not delete them.
+
+        Returns:
+            Number of keys deleted (or that would be deleted if dry_run=True)
+
+        Raises:
+            CacheError: If the operation fails
+
+        Examples:
+            >>> cache = RedisCache()
+            >>> # Dry run first to see scope
+            >>> count = cache.delete_pattern("prediction:*", dry_run=True)
+            >>> print(f"Would delete {count} keys")
+            >>> # Actual deletion
+            >>> deleted = cache.delete_pattern("prediction:*:*:2026-09-19")
+            >>> print(f"Deleted {deleted} prediction keys")
+        """
+        try:
+            deleted_count = 0
+            cursor = 0
+            while True:
+                cursor, keys = self.redis_client.scan(cursor, match=pattern, count=100)
+                if keys:
+                    if dry_run:
+                        deleted_count += len(keys)
+                    else:
+                        deleted_count += self.redis_client.delete(*keys)
+                if cursor == 0:
+                    break
+            return deleted_count
+        except Exception as e:
+            raise CacheError(f"Failed to delete keys with pattern '{pattern}': {e}")
+
     def get_stats(self) -> dict[str, Any]:
         """Get cache statistics.
 
