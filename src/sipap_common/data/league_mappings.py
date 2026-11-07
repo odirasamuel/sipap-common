@@ -264,6 +264,10 @@ COUNTRY_TO_LEAGUES: dict[str, list[str]] = {
         "National League Cup",
         "Community Shield",
         "Community Shield Women",
+        "NPL Premier Division",
+        "Isthmian League Premier Division",
+        "Southern League Premier South",
+        "Southern League Premier Central",
     ],
     "estonia": ["Meistriliiga", "Esiliiga A", "Cup"],
 

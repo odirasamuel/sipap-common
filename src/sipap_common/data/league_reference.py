@@ -1592,6 +1592,57 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "England",
         "type": "cup",
     },
+    {
+        "id": 59,
+        "name": "NPL Premier Division",
+        "country": "England",
+        "type": "league",
+        "tier": 4,
+        "aliases": [
+            "Non League Premier - Northern",
+            "Northern Premier League",
+            "NPL Premier",
+            "NPL",
+            "Northern Premier",
+        ],
+    },
+    {
+        "id": 58,
+        "name": "Isthmian League Premier Division",
+        "country": "England",
+        "type": "league",
+        "tier": 4,
+        "aliases": [
+            "Non League Premier - Isthmian",
+            "Isthmian League",
+            "Isthmian Premier",
+            "Isthmian",
+        ],
+    },
+    {
+        "id": 60,
+        "name": "Southern League Premier South",
+        "country": "England",
+        "type": "league",
+        "tier": 4,
+        "aliases": [
+            "Non League Premier - Southern South",
+            "Southern League Premier Division South",
+            "Southern League South",
+        ],
+    },
+    {
+        "id": 931,
+        "name": "Southern League Premier Central",
+        "country": "England",
+        "type": "league",
+        "tier": 4,
+        "aliases": [
+            "Non League Premier - Southern Central",
+            "Southern League Premier Division Central",
+            "Southern League Central",
+        ],
+    },
     # ============================================================
     # ESTONIA
     # ============================================================
