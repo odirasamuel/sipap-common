@@ -12,6 +12,9 @@ Used by orchestrator for interpreting user queries like:
 - "Cupa României" → Cupa României (Romania Cup)
 """
 
+from typing import Any
+
+
 # International/continental tournaments (API-Football labels as country="World")
 # These should NOT be filtered by host country (e.g., "World Cup in Qatar" → country=None)
 # Dynamically built from LEAGUE_REFERENCE for comprehensive coverage
@@ -829,7 +832,7 @@ def find_similar_leagues(
     query: str,
     country: str | None = None,
     max_suggestions: int = 5,
-) -> list[dict[str, str]]:
+) -> list[dict[str, Any]]:
     """Find similar league names using fuzzy matching.
 
     Uses string similarity to suggest leagues when exact match fails.
@@ -858,7 +861,7 @@ def find_similar_leagues(
     from difflib import SequenceMatcher
 
     query_lower = query.lower()
-    suggestions = []
+    suggestions: list[dict[str, Any]] = []
 
     # Score function: simple string similarity
     def similarity_score(s1: str, s2: str) -> int:
@@ -908,8 +911,8 @@ def find_similar_leagues(
     suggestions.sort(key=lambda x: x["score"], reverse=True)
 
     # Deduplicate: keep only the highest-scoring match for each canonical league
-    seen_leagues = set()
-    unique_suggestions = []
+    seen_leagues: set[str] = set()
+    unique_suggestions: list[dict[str, Any]] = []
     for s in suggestions:
         if s["league"] not in seen_leagues:
             seen_leagues.add(s["league"])

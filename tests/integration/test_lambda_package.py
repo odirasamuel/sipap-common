@@ -110,9 +110,9 @@ class TestBuildScript:
             )
 
             # Check that script succeeded
-            assert (
-                result.returncode == 0
-            ), f"Build script failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+            assert result.returncode == 0, (
+                f"Build script failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+            )
 
             # Check that zip file was created
             expected_zip = repo_root / f"sipap_common_layer_py{python_version}.zip"
@@ -129,9 +129,7 @@ class TestBuildScript:
                 sipap_common_files = [
                     n for n in namelist if "sipap_common" in n and n.endswith(".py")
                 ]
-                assert (
-                    len(sipap_common_files) > 0
-                ), "sipap_common package not found in layer"
+                assert len(sipap_common_files) > 0, "sipap_common package not found in layer"
 
             # Cleanup
             expected_zip.unlink()
@@ -204,12 +202,16 @@ class TestVersionResolution:
         # Simulate version resolution logic (same as in workflow)
         import urllib.request
 
-        with urllib.request.urlopen("https://endoflife.date/api/v1/products/aws-lambda") as response:
+        with urllib.request.urlopen(
+            "https://endoflife.date/api/v1/products/aws-lambda"
+        ) as response:
             data = json.loads(response.read().decode())
 
         # Filter for Python runtimes that are not EOL
         python_releases = [
-            r for r in data["result"]["releases"] if r["name"].startswith("python") and not r["isEol"]
+            r
+            for r in data["result"]["releases"]
+            if r["name"].startswith("python") and not r["isEol"]
         ]
 
         # Sort by version (descending) and take top 3
@@ -222,9 +224,7 @@ class TestVersionResolution:
 
         # Create matrix format
         matrix = {
-            "include": [
-                {"python": release["name"].replace("python", "")} for release in top_3
-            ]
+            "include": [{"python": release["name"].replace("python", "")} for release in top_3]
         }
 
         # Verify result matches expected output

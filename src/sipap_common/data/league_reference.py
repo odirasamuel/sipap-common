@@ -16,7 +16,6 @@ Usage:
 
 from typing import Any
 
-
 # Master league reference with API-Football IDs
 LEAGUE_REFERENCE: list[dict[str, Any]] = [
     # ============================================================
@@ -3061,7 +3060,7 @@ def get_league_reference_for_prompt() -> str:
     # Group by country
     for country in sorted(_LEAGUES_BY_COUNTRY.keys()):
         leagues = _LEAGUES_BY_COUNTRY[country]
-        league_names = [f"{l['name']} (ID: {l['id']})" for l in leagues]
+        league_names = [f"{entry['name']} (ID: {entry['id']})" for entry in leagues]
         lines.append(f"{country.title()}: {', '.join(league_names)}")
 
     return "\n".join(lines)

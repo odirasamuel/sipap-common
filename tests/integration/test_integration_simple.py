@@ -138,7 +138,9 @@ def test_cache_with_timestamps(test_cache):
 @pytest.fixture
 def test_db():
     """Create in-memory test database."""
-    engine = create_engine("sqlite:///:memory:", poolclass=StaticPool, connect_args={"check_same_thread": False})
+    engine = create_engine(
+        "sqlite:///:memory:", poolclass=StaticPool, connect_args={"check_same_thread": False}
+    )
 
     # Create test table
     with engine.connect() as conn:
@@ -170,11 +172,15 @@ def test_database_insert_and_query(test_db):
     """Test database insert and query operations."""
     # Insert data
     with test_db.get_session() as session:
-        session.execute(text("INSERT INTO predictions (match_id, data) VALUES ('M001', 'test_data')"))
+        session.execute(
+            text("INSERT INTO predictions (match_id, data) VALUES ('M001', 'test_data')")
+        )
 
     # Query data
     with test_db.get_session() as session:
-        result = session.execute(text("SELECT * FROM predictions WHERE match_id = 'M001'")).fetchone()
+        result = session.execute(
+            text("SELECT * FROM predictions WHERE match_id = 'M001'")
+        ).fetchone()
         assert result is not None
         assert result[1] == "M001"
 
@@ -185,10 +191,15 @@ def test_database_with_json_utils(test_db):
     json_str = safe_json_dumps(data)
 
     with test_db.get_session() as session:
-        session.execute(text("INSERT INTO predictions (match_id, data) VALUES ('M002', :json_data)"), {"json_data": json_str})
+        session.execute(
+            text("INSERT INTO predictions (match_id, data) VALUES ('M002', :json_data)"),
+            {"json_data": json_str},
+        )
 
     with test_db.get_session() as session:
-        result = session.execute(text("SELECT data FROM predictions WHERE match_id = 'M002'")).scalar()
+        result = session.execute(
+            text("SELECT data FROM predictions WHERE match_id = 'M002'")
+        ).scalar()
         retrieved_data = safe_json_loads(result)
         assert retrieved_data["outcome"] == "home_win"
 
@@ -207,7 +218,9 @@ def test_database_with_retry(test_db):
             raise DatabaseError("Transient error")
 
         with test_db.get_session() as session:
-            session.execute(text("INSERT INTO predictions (match_id, data) VALUES ('M003', 'retry_test')"))
+            session.execute(
+                text("INSERT INTO predictions (match_id, data) VALUES ('M003', 'retry_test')")
+            )
 
     insert_with_retry()
     assert attempt_count == 3
@@ -258,11 +271,19 @@ def test_database_and_cache_integration(test_db, test_cache):
 
         with test_db.get_session() as session:
             # Insert test data first
-            session.execute(text("INSERT OR IGNORE INTO predictions (match_id, data) VALUES (:match_id, :data)"), {"match_id": match_id, "data": "cached_data"})
+            session.execute(
+                text(
+                    "INSERT OR IGNORE INTO predictions (match_id, data) VALUES (:match_id, :data)"
+                ),
+                {"match_id": match_id, "data": "cached_data"},
+            )
             session.commit()
 
             # Query data
-            result = session.execute(text("SELECT data FROM predictions WHERE match_id = :match_id"), {"match_id": match_id}).scalar()
+            result = session.execute(
+                text("SELECT data FROM predictions WHERE match_id = :match_id"),
+                {"match_id": match_id},
+            ).scalar()
             return {"match_id": match_id, "data": result}
 
     # First call - database hit
@@ -314,11 +335,16 @@ def test_json_timestamp_database_workflow(test_db):
 
     # 3. Store in database
     with test_db.get_session() as session:
-        session.execute(text("INSERT INTO predictions (match_id, data) VALUES ('M005', :data)"), {"data": json_str})
+        session.execute(
+            text("INSERT INTO predictions (match_id, data) VALUES ('M005', :data)"),
+            {"data": json_str},
+        )
 
     # 4. Retrieve and deserialize
     with test_db.get_session() as session:
-        result_json = session.execute(text("SELECT data FROM predictions WHERE match_id = 'M005'")).scalar()
+        result_json = session.execute(
+            text("SELECT data FROM predictions WHERE match_id = 'M005'")
+        ).scalar()
         result_data = safe_json_loads(result_json)
 
     # 5. Verify timestamp preserved
@@ -334,14 +360,22 @@ def test_complete_pipeline(test_db, test_cache):
     @cache_result(redis_client=test_cache.redis_client, ttl=60)
     def fetch_match_data(match_id: str) -> dict:
         logger.info(f"Fetching match data for {match_id}")
-        return {"match_id": match_id, "home_team": "Arsenal", "away_team": "Chelsea", "timestamp": current_timestamp()}
+        return {
+            "match_id": match_id,
+            "home_team": "Arsenal",
+            "away_team": "Chelsea",
+            "timestamp": current_timestamp(),
+        }
 
     # 2. Fetch data (cache miss)
     match_data = fetch_match_data("M006")
 
     # 3. Store in database
     with test_db.get_session() as session:
-        session.execute(text("INSERT INTO predictions (match_id, data) VALUES (:match_id, :data)"), {"match_id": match_data["match_id"], "data": safe_json_dumps(match_data)})
+        session.execute(
+            text("INSERT INTO predictions (match_id, data) VALUES (:match_id, :data)"),
+            {"match_id": match_data["match_id"], "data": safe_json_dumps(match_data)},
+        )
 
     # 4. Fetch again (cache hit)
     cached_data = fetch_match_data("M006")
@@ -349,7 +383,9 @@ def test_complete_pipeline(test_db, test_cache):
 
     # 5. Retrieve from database
     with test_db.get_session() as session:
-        db_data = session.execute(text("SELECT data FROM predictions WHERE match_id = 'M006'")).scalar()
+        db_data = session.execute(
+            text("SELECT data FROM predictions WHERE match_id = 'M006'")
+        ).scalar()
         db_parsed = safe_json_loads(db_data)
 
     # 6. Verify all match

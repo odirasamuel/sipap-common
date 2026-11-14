@@ -111,7 +111,11 @@ def get_aws_client(
             )
 
         # Create client from session
-        client = session.client(service_name, region_name=region, **kwargs)
+        # boto3-stubs overload client() on literal service names; the name is
+        # only known at runtime here.
+        client = session.client(  # type: ignore[call-overload]
+            service_name, region_name=region, **kwargs
+        )
         return client
 
     except (BotoCoreError, ClientError) as e:
