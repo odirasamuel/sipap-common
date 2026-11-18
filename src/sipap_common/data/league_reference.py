@@ -14,6 +14,7 @@ Usage:
     )
 """
 
+import re
 from typing import Any
 
 # Master league reference with API-Football IDs
@@ -1039,6 +1040,7 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
     {
         "id": 15,
         "name": "FIFA Club World Cup",
+        "aliases": ["Club World Cup"],
         "country": "World",
         "type": "cup",
         "tier": 3,
@@ -1064,7 +1066,6 @@ LEAGUE_REFERENCE: list[dict[str, Any]] = [
         "country": "World",
         "type": "cup",
         "tier": 3,
-        "aliases": ["Club World Cup", "FIFA Club World Cup"],
     },
     {
         "id": 34,
@@ -2982,9 +2983,80 @@ def get_leagues_for_country_by_id(country: str) -> list[dict[str, Any]]:
     return _LEAGUES_BY_COUNTRY.get(country_normalized, [])
 
 
+# Adjectives that do not start with the country's name ("austrian" is found
+# by its "austria" prefix and needs no entry).
+_COUNTRY_ADJECTIVES: dict[str, str] = {
+    "scottish": "scotland",
+    "english": "england",
+    "spanish": "spain",
+    "french": "france",
+    "dutch": "netherlands",
+    "italian": "italy",
+    "turkish": "turkey",
+    "greek": "greece",
+    "swiss": "switzerland",
+    "danish": "denmark",
+    "swedish": "sweden",
+    "belgian": "belgium",
+    "irish": "ireland",
+    "welsh": "wales",
+    "polish": "poland",
+    "norwegian": "norway",
+    "finnish": "finland",
+    "czech": "czech republic",
+    "saudi": "saudi arabia",
+    "emirati": "united arab emirates",
+    "korean": "south korea",
+    "american": "usa",
+}
+
+_WORD_CHAR = "[a-z0-9]"
+
+
+def _has_term(term: str, text: str, prefix: bool = False) -> bool:
+    """Whether ``term`` occurs in ``text`` as whole words.
+
+    With ``prefix`` the term may be the start of a longer word, so "austria"
+    is found in "austrian".
+    """
+    if not term:
+        return False
+    tail = "" if prefix else f"(?!{_WORD_CHAR})"
+    return re.search(f"(?<!{_WORD_CHAR}){re.escape(term)}{tail}", text) is not None
+
+
+def _countries_named(query_lower: str) -> list[str]:
+    """Country keys (as used by ``_LEAGUES_BY_COUNTRY``) named in the query, in order found."""
+    found: list[str] = []
+
+    def add(country: str) -> None:
+        key = country.replace("-", " ")
+        if key in _LEAGUES_BY_COUNTRY and key not in found:
+            found.append(key)
+
+    for country in _LEAGUES_BY_COUNTRY:
+        # Short names ("usa") must be whole words; longer ones may carry an ending.
+        if _has_term(country, query_lower, prefix=len(country) >= 5):
+            add(country)
+    for variant, country in _COUNTRY_VARIANTS.items():
+        if _has_term(variant, query_lower):
+            add(country)
+    for adjective, country in _COUNTRY_ADJECTIVES.items():
+        if _has_term(adjective, query_lower):
+            add(country)
+    # "northern ireland" also contains "ireland": keep only the fuller name.
+    return [c for c in found if not any(c != other and c in other for other in found)]
+
+
 def resolve_league_query(query: str) -> list[dict[str, Any]]:
     """
     Resolve a user query to matching leagues.
+
+    A league matches when its name or one of its aliases appears in the query
+    as whole words. The most specific match wins. When several leagues share
+    that name, a country named in the query decides; otherwise the first in
+    the reference list is returned, as before. A query that names only a
+    country returns that country's leagues.
 
     Args:
         query: User input like "La Liga", "Spanish league", "EPL"
@@ -2993,43 +3065,31 @@ def resolve_league_query(query: str) -> list[dict[str, Any]]:
         List of matching league dicts with API-Football IDs
     """
     query_lower = query.lower().strip()
+    countries = _countries_named(query_lower)
 
-    # Check for exact alias match first (alias found IN query)
+    # For each league the query names: the length of its longest matching name
+    # or alias, then the length of its own name if that matched (so that
+    # "Serie A Women" beats the alias "Italy Serie A" of a different league).
+    candidates: list[tuple[tuple[int, int], dict[str, Any]]] = []
     for league in LEAGUE_REFERENCE:
-        aliases = league.get("aliases", [])
-        # Check if any alias appears in the query (not vice versa)
-        if any(a.lower() in query_lower for a in aliases):
-            return [league]
+        name = league["name"]
+        terms = [name, *(league.get("aliases") or [])]
+        lengths = [len(term) for term in terms if _has_term(term.lower(), query_lower)]
+        if lengths:
+            own_name = len(name) if _has_term(name.lower(), query_lower) else 0
+            candidates.append(((max(lengths), own_name), league))
 
-    # Check for name match (league name found IN query)
-    for league in LEAGUE_REFERENCE:
-        if league["name"].lower() in query_lower:
-            return [league]
+    if candidates:
+        in_named_country = [
+            (score, league) for score, league in candidates
+            if league["country"].lower() in countries
+        ]
+        pool = in_named_country or candidates
+        best = max(score for score, _ in pool)
+        return [next(league for score, league in pool if score == best)]
 
-    # Check for partial name match (league name found IN query)
-    matches = []
-    for league in LEAGUE_REFERENCE:
-        if league["name"].lower() in query_lower:
-            matches.append(league)
-
-    if matches:
-        return matches
-
-    # Check for country name IN query (e.g., "Azerbaijan Today" contains "azerbaijan")
-    # Check both _LEAGUES_BY_COUNTRY keys and _COUNTRY_VARIANTS keys
-    for country in _LEAGUES_BY_COUNTRY.keys():
-        if country in query_lower:
-            return _LEAGUES_BY_COUNTRY[country]
-
-    # Check country variants (e.g., "usa", "holland", "uk")
-    for variant, normalized in _COUNTRY_VARIANTS.items():
-        if variant in query_lower:
-            return _LEAGUES_BY_COUNTRY.get(normalized, [])
-
-    # Check for "[country] league" pattern
-    for country in _LEAGUES_BY_COUNTRY.keys():
-        if f"{country} league" in query_lower or f"{country}n league" in query_lower:
-            return _LEAGUES_BY_COUNTRY[country]
+    if countries:
+        return _LEAGUES_BY_COUNTRY[countries[0]]
 
     return []
 
