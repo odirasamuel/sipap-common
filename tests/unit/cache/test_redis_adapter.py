@@ -333,7 +333,9 @@ def test_connections_have_timeouts_by_default(monkeypatch) -> None:
         return object()
 
     monkeypatch.setattr("sipap_common.cache.redis_adapter.redis.ConnectionPool", fake_pool)
-    monkeypatch.setattr("sipap_common.cache.redis_adapter.redis.Redis", lambda connection_pool: Mock())
+    monkeypatch.setattr(
+        "sipap_common.cache.redis_adapter.redis.Redis", lambda connection_pool: Mock()
+    )
 
     RedisCache(host="cache.internal")
 
@@ -350,7 +352,9 @@ def test_timeouts_can_be_overridden(monkeypatch) -> None:
         return object()
 
     monkeypatch.setattr("sipap_common.cache.redis_adapter.redis.ConnectionPool", fake_pool)
-    monkeypatch.setattr("sipap_common.cache.redis_adapter.redis.Redis", lambda connection_pool: Mock())
+    monkeypatch.setattr(
+        "sipap_common.cache.redis_adapter.redis.Redis", lambda connection_pool: Mock()
+    )
 
     RedisCache(host="cache.internal", socket_timeout=1.5, socket_connect_timeout=0.5)
 
