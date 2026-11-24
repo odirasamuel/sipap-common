@@ -322,3 +322,41 @@ def test_cache_serialization_handles_complex_types(redis_cache, mock_redis) -> N
     # Should be able to deserialize back
     deserialized = json.loads(serialized)
     assert deserialized == complex_data
+
+
+def test_connections_have_timeouts_by_default(monkeypatch) -> None:
+    """A Redis that stops answering must fail the call, not hang the caller."""
+    captured: dict = {}
+
+    def fake_pool(**kwargs):
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr("sipap_common.cache.redis_adapter.redis.ConnectionPool", fake_pool)
+    monkeypatch.setattr(
+        "sipap_common.cache.redis_adapter.redis.Redis", lambda connection_pool: Mock()
+    )
+
+    RedisCache(host="cache.internal")
+
+    assert captured["socket_connect_timeout"] == 5.0
+    assert captured["socket_timeout"] == 5.0
+    assert captured["health_check_interval"] == 30
+
+
+def test_timeouts_can_be_overridden(monkeypatch) -> None:
+    captured: dict = {}
+
+    def fake_pool(**kwargs):
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr("sipap_common.cache.redis_adapter.redis.ConnectionPool", fake_pool)
+    monkeypatch.setattr(
+        "sipap_common.cache.redis_adapter.redis.Redis", lambda connection_pool: Mock()
+    )
+
+    RedisCache(host="cache.internal", socket_timeout=1.5, socket_connect_timeout=0.5)
+
+    assert captured["socket_timeout"] == 1.5
+    assert captured["socket_connect_timeout"] == 0.5

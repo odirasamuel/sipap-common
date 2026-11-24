@@ -31,6 +31,8 @@ class RedisCache:
         max_connections: int = 50,
         redis_client: Any | None = None,
         ssl: bool = False,
+        socket_connect_timeout: float = 5.0,
+        socket_timeout: float = 5.0,
     ) -> None:
         """Initialize Redis cache.
 
@@ -43,6 +45,9 @@ class RedisCache:
             max_connections: Maximum connections in pool
             redis_client: Optional Redis client for testing
             ssl: Enable SSL/TLS connection (required for ElastiCache serverless)
+            socket_connect_timeout: Seconds to wait for a connection before failing
+            socket_timeout: Seconds to wait for a reply before failing. Without
+                these a Redis that stops answering blocks the caller forever.
 
         Raises:
             CacheError: If Redis initialization fails
@@ -61,6 +66,11 @@ class RedisCache:
                     "password": password,
                     "max_connections": max_connections,
                     "decode_responses": False,  # We'll handle encoding/decoding
+                    "socket_connect_timeout": socket_connect_timeout,
+                    "socket_timeout": socket_timeout,
+                    # Ping connections idle for 30 s before reuse, so a dropped
+                    # connection is replaced instead of failing the next call.
+                    "health_check_interval": 30,
                 }
 
                 # Add SSL parameters only when SSL is enabled
